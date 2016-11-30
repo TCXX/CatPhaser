@@ -31,11 +31,11 @@ function preload() {
 }
 
 var player;
+var layer;
 var platforms;
 var cursors;
-var map;
-
 var stars;
+
 var score = 0;
 var life = 9;
 var scoreText;
@@ -56,6 +56,7 @@ function create() {
     //  Add blocks as tile sprite
     map = game.add.tilemap('level1');
     map.addTilesetImage('block');
+    map.setCollisionByExclusion([ 13, 14, 15, 16, 46, 47, 48, 49, 50, 51 ]);
     layer = map.createLayer('Tile Layer 1');
     
 
@@ -72,7 +73,7 @@ function create() {
     ground.body.immovable = true;
 
     // The player and its settings
-    player = game.add.sprite(32, game.world.height - 150, 'dude');
+    player = game.add.sprite(32, 0, 'dude');
 
     //  We need to enable physics on the player
     game.physics.arcade.enable(player);
@@ -108,7 +109,7 @@ function create() {
     //  The score
     scoreText = game.add.text(16, 12, 'Score: 0', { fontSize: '32px', fill: '#000' });
 
-    //The life
+    //  The life
     lifeText = game.add.text(16, 40, 'Life: 9', { fontSize: '32px', fill: '#000' });
 
     //  Our controls.
@@ -121,6 +122,8 @@ function update() {
     //  Collide the player and the stars with the platforms
     game.physics.arcade.collide(player, platforms);
     game.physics.arcade.collide(stars, platforms);
+    game.physics.arcade.collide(player, layer);
+    game.physics.arcade.collide(stars, layer);
 
     //  Checks to see if the player overlaps with any of the stars, if he does call the collectStar function
     game.physics.arcade.overlap(player, stars, collectStar, null, this);
