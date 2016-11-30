@@ -1,8 +1,8 @@
-<!doctype html> 
-<html lang="en"> 
-<head> 
+<!doctype html>
+<html lang="en">
+<head>
 	<meta charset="UTF-8" />
-    <title>Phaser - Making your first game, part 9</title>
+    <title>Cat Adventure</title>
 	<script type="text/javascript" src="js/phaser.min.js"></script>
     <style type="text/css">
         body {
@@ -19,9 +19,9 @@ var game = new Phaser.Game(825, 660, Phaser.AUTO, '', { preload: preload, create
 function preload() {
 
     game.load.image('bg', 'assets/bg.png');
-    
+
     game.load.tilemap('level1', 'assets/level1.json', null, Phaser.Tilemap.TILED_JSON);
-    
+
     game.load.image('ground', 'assets/block.png');
     game.load.image('block', 'assets/block.png');
     game.load.image('star', 'assets/star.png');
@@ -45,8 +45,8 @@ function create() {
 
     //  A simple background for our game
     game.add.sprite(0, 0, 'bg');
-    
-    
+
+
     //  The platforms group contains the ground and the 2 ledges we can jump on
     platforms = game.add.group();
 
@@ -58,7 +58,7 @@ function create() {
     map.addTilesetImage('block');
     map.setCollisionByExclusion([ 13, 14, 15, 16, 46, 47, 48, 49, 50, 51 ]);
     layer = map.createLayer('Tile Layer 1');
-    
+
 
     // Here we create the ground.
     var ground = platforms.create(0, game.world.height - 64, 'ground');
@@ -122,7 +122,7 @@ function update() {
     //  Collide the player and the stars with the platforms
     game.physics.arcade.collide(player, platforms);
     game.physics.arcade.collide(stars, platforms);
-    game.physics.arcade.collide(player, layer);
+    var hitLayer = game.physics.arcade.collide(player, layer);
     game.physics.arcade.collide(stars, layer);
 
     //  Checks to see if the player overlaps with any of the stars, if he does call the collectStar function
@@ -153,8 +153,10 @@ function update() {
         player.frame = 4;
     }
 
-    //  Allow the player to jump if they are touching the ground.
-    if (cursors.up.isDown && player.body.touching.down)
+    //  Allow the player to jump if they are touching the blocks(layer) or the platform.
+
+		console.log(hitLayer);
+    if (cursors.up.isDown && (hitLayer || player.body.touching.down))
     {
         player.body.velocity.y = -250;
     }
