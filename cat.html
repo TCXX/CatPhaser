@@ -74,6 +74,7 @@ function create() {
 
     // The player and its settings
     player = game.add.sprite(32, 0, 'dude');
+    player.health = 9;
 
     //  We need to enable physics on the player
     game.physics.arcade.enable(player);
@@ -179,13 +180,10 @@ function collectStar (player, star) {
 }
 
 function playerDies(){
-	life -= 1;
-	lifeText.text = 'Life: ' + life;
-	console.log("Position");
-	//player.x = 32;
-	//player.y = 0;
 	// Put player back in the original place.
-	player.reset(32,0,1);
+	player.reset(32, 0, player.health-1);
+	
+	lifeText.text = 'Life: ' + player.health;	
 }
 
 </script>
