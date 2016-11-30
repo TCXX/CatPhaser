@@ -24,11 +24,12 @@ function preload() {
     game.load.image('bg', 'assets/bg.png');
 
     game.load.tilemap('level1', 'assets/map-hearts.json', null, Phaser.Tilemap.TILED_JSON);
+    game.load.tilemap('level2', 'assets/map-cafe.json', null, Phaser.Tilemap.TILED_JSON);
 
     game.load.image('ground', 'assets/block.png');
     game.load.image('block', 'assets/block.png');
     game.load.image('star', 'assets/star.png');
-		game.load.image('bubble', 'assets/bubble.png');
+	game.load.image('bubble', 'assets/bubble.png');
     //game.load.spritesheet('dude', 'assets/cats.png', 28, 42);
     game.load.image('dude', 'assets/cat.png', 28, 28);
 
@@ -36,11 +37,14 @@ function preload() {
 
 var player;
 var layer;
-var platforms;
-var cursors;
 var stars;
 var bubble;
+var map;
 
+var platforms;
+var cursors;
+
+var currentLevel = 1;
 var score = 0;
 var life = 9;
 var scoreText;
@@ -58,12 +62,6 @@ function create() {
     //  We will enable physics for any object that is created in this group
     platforms.enableBody = true;
 
-    //  Add blocks as tile sprite
-    map = game.add.tilemap('level1');
-    map.addTilesetImage('block');
-    map.setCollisionByExclusion([ 13, 14, 15, 16, 46, 47, 48, 49, 50, 51 ]);
-    layer = map.createLayer('Tile Layer 1');
-    //layer.fixedToCamera = false;
 
     // Here we create the ground.
     var ground = platforms.create(0, game.world.height - 64, 'ground');
@@ -78,12 +76,12 @@ function create() {
     player = game.add.sprite(32, 0, 'dude');
     player.health = 9;
 
-		// Add bubble and set its position:
-		bubble = game.add.sprite(120, 250,'bubble');
-		bubble.scale.setTo(3,3);
+	// Add bubble and set its position:
+	bubble = game.add.sprite(120, 250,'bubble');
+	bubble.scale.setTo(3,3);
     //  We need to enable physics on the player
     game.physics.arcade.enable(player);
-		game.physics.arcade.enable(bubble);
+	game.physics.arcade.enable(bubble);
     //  Player physics properties. Give the little guy a slight bounce.
     player.body.bounce.y = 0.25;
     player.body.gravity.y = 300;
@@ -98,9 +96,9 @@ function create() {
 
     //  We will enable physics for any star that is created in this group
     stars.enableBody = true;
-		bubble.enableBody = true;
+	bubble.enableBody = true;
 
-
+	loadMap ('level' + currentLevel);
 
     //  Here we'll create 12 of them evenly spaced apart
     for (var i = 0; i < 12; i++)
@@ -136,8 +134,8 @@ function update() {
     //  Checks to see if the player overlaps with any of the stars, if he does call the collectStar function
     game.physics.arcade.overlap(player, stars, collectStar, null, this);
 
-		// Checks to see if the player reaches the bubble
-		game.physics.arcade.overlap(player, bubble, reachBubble, null, this);
+	// Checks to see if the player reaches the bubble
+	game.physics.arcade.overlap(player, bubble, reachBubble, null, this);
     //  Reset the players velocity (movement)
     player.body.velocity.x = 0;
 
@@ -165,8 +163,8 @@ function update() {
 
     if (player.y > game.world.height && player.health > 0) {
     	playerDies();
-			console.log("Die");
-			//player = game.add.sprite(32, 0, 'dude');
+		console.log("Die");
+		//player = game.add.sprite(32, 0, 'dude');
     }
 
     //  Allow the player to jump if they are touching the blocks(layer) or the platform.
@@ -178,10 +176,18 @@ function update() {
 
 }
 
-function collectStar (player, star) {
+function loadMap () {
+	//  Add blocks as tile sprite
+    map = game.add.tilemap('level' + currentLevel);
+    map.addTilesetImage('block');
+    map.setCollisionByExclusion([ 13, 14, 15, 16, 46, 47, 48, 49, 50, 51 ]);
+    layer = map.createLayer('Tile Layer 1');
 
+}
+
+function collectStar (player, star) {
     // Removes the star from the screen
-    star.kill();
+    star.destroy();
 
     //  Add and update the score
     score += 10;
@@ -189,10 +195,18 @@ function collectStar (player, star) {
 }
 
 function reachBubble (player, bubble){
-		console.log("bubble");
-		bubble.kill();
-		alert("Next level!");
-		game.world.removeAll();
+	console.log("bubble");
+	nextLevel();
+}
+
+function nextLevel () {
+	alert("Good job! ");
+	
+	player.reset(32, 0, player.health);
+    layer.destroy();
+    
+    currentLevel +=1;
+	loadMap ("level" + currentLevel);
 }
 
 function playerDies(){
