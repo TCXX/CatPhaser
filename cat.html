@@ -28,6 +28,7 @@ function preload() {
     game.load.image('ground', 'assets/block.png');
     game.load.image('block', 'assets/block.png');
     game.load.image('star', 'assets/star.png');
+		game.load.image('bubble', 'assets/bubble.png');
     //game.load.spritesheet('dude', 'assets/cats.png', 28, 42);
     game.load.image('dude', 'assets/cat.png', 28, 28);
 
@@ -38,6 +39,7 @@ var layer;
 var platforms;
 var cursors;
 var stars;
+var bubble;
 
 var score = 0;
 var life = 9;
@@ -76,9 +78,12 @@ function create() {
     player = game.add.sprite(32, 0, 'dude');
     player.health = 9;
 
+		// Add bubble and set its position:
+		bubble = game.add.sprite(120, 250,'bubble');
+
     //  We need to enable physics on the player
     game.physics.arcade.enable(player);
-
+		game.physics.arcade.enable(bubble);
     //  Player physics properties. Give the little guy a slight bounce.
     player.body.bounce.y = 0.25;
     player.body.gravity.y = 300;
@@ -93,6 +98,9 @@ function create() {
 
     //  We will enable physics for any star that is created in this group
     stars.enableBody = true;
+		bubble.enableBody = true;
+
+
 
     //  Here we'll create 12 of them evenly spaced apart
     for (var i = 0; i < 12; i++)
@@ -128,6 +136,10 @@ function update() {
     //  Checks to see if the player overlaps with any of the stars, if he does call the collectStar function
     game.physics.arcade.overlap(player, stars, collectStar, null, this);
 
+		// Checks to see if the player reaches the bubble
+		console.log("Player-bubble-1");
+		game.physics.arcade.overlap(player, bubble, reachBubble, null, this);
+		console.log("Player-bubble-2");
     //  Reset the players velocity (movement)
     player.body.velocity.x = 0;
 
@@ -153,7 +165,7 @@ function update() {
         player.frame = 4;
     }
 
-    if (player.y > game.world.height && life > 0) {
+    if (player.y > game.world.height && player.health > 0) {
     	playerDies();
 			console.log("Die");
 			//player = game.add.sprite(32, 0, 'dude');
@@ -176,14 +188,19 @@ function collectStar (player, star) {
     //  Add and update the score
     score += 10;
     scoreText.text = 'Score: ' + score;
+}
 
+function reachBubble (player, bubble){
+		console.log("bubble");
+		bubble.kill();
+		alert("Next level!");
 }
 
 function playerDies(){
 	// Put player back in the original place.
 	player.reset(32, 0, player.health-1);
-	
-	lifeText.text = 'Life: ' + player.health;	
+
+	lifeText.text = 'Life: ' + player.health;
 }
 
 </script>
