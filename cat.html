@@ -1,6 +1,6 @@
-<!doctype html>
-<html lang="en">
-<head>
+<!doctype html> 
+<html lang="en"> 
+<head> 
 	<meta charset="UTF-8" />
     <title>Phaser - Making your first game, part 9</title>
 	<script type="text/javascript" src="js/phaser.min.js"></script>
@@ -19,6 +19,9 @@ var game = new Phaser.Game(825, 660, Phaser.AUTO, '', { preload: preload, create
 function preload() {
 
     game.load.image('bg', 'assets/bg.png');
+    
+    game.load.tilemap('level1', 'assets/level1.json', null, Phaser.Tilemap.TILED_JSON);
+    
     game.load.image('ground', 'assets/block.png');
     game.load.image('block', 'assets/block.png');
     game.load.image('star', 'assets/star.png');
@@ -30,6 +33,7 @@ function preload() {
 var player;
 var platforms;
 var cursors;
+var map;
 
 var stars;
 var score = 0;
@@ -41,12 +45,19 @@ function create() {
 
     //  A simple background for our game
     game.add.sprite(0, 0, 'bg');
-
+    
+    
     //  The platforms group contains the ground and the 2 ledges we can jump on
     platforms = game.add.group();
 
     //  We will enable physics for any object that is created in this group
     platforms.enableBody = true;
+
+    //  Add blocks as tile sprite
+    map = game.add.tilemap('level1');
+    map.addTilesetImage('block');
+    layer = map.createLayer('Tile Layer 1');
+    
 
     // Here we create the ground.
     var ground = platforms.create(0, game.world.height - 64, 'ground');
@@ -59,13 +70,6 @@ function create() {
 
     //  This stops it from falling away when you jump on it
     ground.body.immovable = true;
-
-    //  Now let's create two ledges
-    var ledge = platforms.create(400, game.world.height - 400, 'block');
-    ledge.body.immovable = true;
-
-    ledge = platforms.create(150, game.world.height - 250, 'block');
-    ledge.body.immovable = true;
 
     // The player and its settings
     player = game.add.sprite(32, game.world.height - 150, 'dude');
@@ -86,7 +90,7 @@ function create() {
     stars = game.add.group();
 
     //  We will enable physics for any star that is created in this group
-    //stars.enableBody = true;
+    stars.enableBody = true;
 
     //  Here we'll create 12 of them evenly spaced apart
     for (var i = 0; i < 12; i++)
@@ -95,10 +99,10 @@ function create() {
         var star = stars.create(i * 70, 0, 'star');
 
         //  Let gravity do its thing
-        //star.body.gravity.y = 300;
+        star.body.gravity.y = 300;
 
         //  This just gives each star a slightly random bounce value
-        //star.body.bounce.y = 0.7 + Math.random() * 0.2;
+        star.body.bounce.y = 0.7 + Math.random() * 0.2;
     }
 
     //  The score
@@ -116,10 +120,10 @@ function update() {
 
     //  Collide the player and the stars with the platforms
     game.physics.arcade.collide(player, platforms);
-    //game.physics.arcade.collide(stars, platforms);
+    game.physics.arcade.collide(stars, platforms);
 
     //  Checks to see if the player overlaps with any of the stars, if he does call the collectStar function
-    //game.physics.arcade.overlap(player, stars, collectStar, null, this);
+    game.physics.arcade.overlap(player, stars, collectStar, null, this);
 
     //  Reset the players velocity (movement)
     player.body.velocity.x = 0;
