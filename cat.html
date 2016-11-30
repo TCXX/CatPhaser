@@ -23,7 +23,7 @@ function preload() {
 
     game.load.image('bg', 'assets/bg.png');
 
-    game.load.tilemap('level1', 'assets/map-l6.json', null, Phaser.Tilemap.TILED_JSON);
+    game.load.tilemap('level1', 'assets/map-hearts.json', null, Phaser.Tilemap.TILED_JSON);
 
     game.load.image('ground', 'assets/block.png');
     game.load.image('block', 'assets/block.png');
@@ -61,7 +61,7 @@ function create() {
     map.addTilesetImage('block');
     map.setCollisionByExclusion([ 13, 14, 15, 16, 46, 47, 48, 49, 50, 51 ]);
     layer = map.createLayer('Tile Layer 1');
-
+    //layer.fixedToCamera = false;
 
     // Here we create the ground.
     var ground = platforms.create(0, game.world.height - 64, 'ground');
@@ -81,7 +81,7 @@ function create() {
     //  Player physics properties. Give the little guy a slight bounce.
     player.body.bounce.y = 0.25;
     player.body.gravity.y = 300;
-    player.body.collideWorldBounds = true;
+    //player.body.collideWorldBounds = true;
 
     //  Our two animations, walking left and right.
     //player.animations.add('left', [0, 1, 2, 3], 10, true);
@@ -151,6 +151,10 @@ function update() {
 
         player.frame = 4;
     }
+    
+    if (player.y > game.world.height) {
+    	playerDies();
+    }
 
     //  Allow the player to jump if they are touching the blocks(layer) or the platform.
     var hitLayer = game.physics.arcade.collide(player, layer);
@@ -170,6 +174,13 @@ function collectStar (player, star) {
     score += 10;
     scoreText.text = 'Score: ' + score;
 
+}
+
+function playerDies(){
+	life -= 1;
+	lifeText.text = 'Life: ' + life;
+	player.position.x = 32;
+	player.position.y = 0;
 }
 
 </script>
