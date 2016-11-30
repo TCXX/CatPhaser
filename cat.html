@@ -151,15 +151,17 @@ function update() {
 
         player.frame = 4;
     }
-    
-    if (player.y > game.world.height) {
+
+    if (player.y > game.world.height && life > 0) {
     	playerDies();
+			console.log("Die");
+			//player = game.add.sprite(32, 0, 'dude');
     }
 
     //  Allow the player to jump if they are touching the blocks(layer) or the platform.
     var hitLayer = game.physics.arcade.collide(player, layer);
     if (cursors.up.isDown && hitLayer)
-    { 
+    {
     	player.body.velocity.y = -200;
     }
 
@@ -179,8 +181,11 @@ function collectStar (player, star) {
 function playerDies(){
 	life -= 1;
 	lifeText.text = 'Life: ' + life;
-	player.position.x = 32;
-	player.position.y = 0;
+	console.log("Position");
+	//player.x = 32;
+	//player.y = 0;
+	// Put player back in the original place.
+	player.reset(32,0,1);
 }
 
 </script>
