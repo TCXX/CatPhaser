@@ -45,235 +45,262 @@
 
 
 	<script type="text/javascript">
+//  Variables needed for preload.
+var game = new Phaser.Game(825, 600, Phaser.AUTO, '', { preload: preload, create: load, update: update });
+var totalLevels;
 
-	//  Variables needed for preload.
-	var game = new Phaser.Game(825, 600, Phaser.AUTO, '', { preload: preload, create: load, update: update });
-	var totalLevels;
+//  First stage in Phaser, load resources from server.
+function preload() {
+	game.load.json('leveldata', 'assets/leveldata.json');
+	//game.load.text('leveldata', 'assets/LevelData.json');
+	//game.load.tilemap('level1', 'assets/map-tree.json', null, Phaser.Tilemap.TILED_JSON);
+	
+	game.load.image('bg', 'assets/bg.png');
+    game.load.image('block', 'assets/block.png');
+    //game.load.image('star', 'assets/star.png');
+	game.load.image('bubble', 'assets/bubble.png');
+    game.load.spritesheet('dude', 'assets/cats.png', 25, 25);
+    //game.load.image('dude', 'assets/cat.png', 28, 28);
 
-	//  First stage in Phaser, load resources from server.
-	function preload() {
-		game.load.json('leveldata', 'assets/leveldata.json');
-		//game.load.text('leveldata', 'assets/LevelData.json');
-		//game.load.tilemap('level1', 'assets/map-tree.json', null, Phaser.Tilemap.TILED_JSON);
+}
 
-		game.load.image('bg', 'assets/bg.png');
-		game.load.image('block', 'assets/block.png');
-		//game.load.image('star', 'assets/star.png');
-		game.load.image('bubble', 'assets/bubble.png');
-		game.load.spritesheet('dude', 'assets/cats.png', 25, 25);
-		//game.load.image('dude', 'assets/cat.png', 28, 28);
+//  Display objects
+var player;
+var layer;
+//var stars;
+var door;
+var map;
 
+//  Input means
+var cursors;
+
+//  Game status
+var gameStarted = false;
+var doorReached = 0;
+var currentLevel = 1;
+var score = 0;
+var scoreText;
+var lifeText;
+
+//  Data
+var phaserJSON;
+
+//  Second stage in phaser, load more map files according to leveldata.JSON
+function load(){
+	
+	//  Read file names from the main JSON file containing level names.
+	phaserJSON = game.cache.getJSON('leveldata');
+	var data = phaserJSON.leveldata;
+	totalLevels = data.length;
+	//  Load the corresponding files for maps.
+	for (var i = 1; i <= totalLevels; i++){
+		//  e. g. Load 'assets/map-hearts.json' for "name": hearts in leveldata.JSON
+		var file = 'assets/map-' + phaserJSON.leveldata[i-1].name + '.json';
+		game.load.tilemap('level' + i, file, null, Phaser.Tilemap.TILED_JSON);
+	}
+	
+	//  Manually start loading after preload.
+	game.load.start();
+	
+	//  When finished loading all maps, call create().
+	game.load.onLoadComplete.add(create, this);
+}
+
+//  Load the rest of stuffs for the game.
+function create() {
+	
+	//  Here is when update() starts to loop because create() is completed.
+	//  Therefore we use bool variable gameStarted to control whether update() should do its thing.
+	
+    //  Background image.
+    game.add.sprite(0, 0, 'bg');
+	
+	//  Add map.
+	loadMap ();
+	
+    //  Add player and door.
+    player = game.add.sprite(phaserJSON.leveldata[currentLevel-1].player_x, phaserJSON.leveldata[currentLevel-1].player_y, 'dude');
+	door = game.add.sprite(phaserJSON.leveldata[currentLevel-1].door_x, phaserJSON.leveldata[currentLevel-1].door_y, 'bubble');
+
+    //  Set player's animations for walking.
+	player.scale.setTo(0.82, 0.82);
+    player.animations.add('left', [0, 1], 10, true);
+    player.animations.add('right', [3, 4], 10, true);
+
+    //  Add Texts.
+	player.health = 9;
+    scoreText = game.add.text(game.width - 30 - 100, 40, 'Score: 0', { fontSize: '32px', fill: '#000' });
+    lifeText = game.add.text(game.width - 30 - 100, 10, 'Life: 9', { fontSize: '32px', fill: '#000' });
+
+    //  Set input controls.
+    cursors = game.input.keyboard.createCursorKeys();
+		
+	//  Turn on Physics.
+    game.physics.startSystem(Phaser.Physics.ARCADE);
+	game.physics.arcade.isPaused = true;
+	
+	//  Set physics properties for items.
+	game.physics.arcade.enable(player);
+	game.physics.arcade.enable(door);
+    player.body.bounce.y = 0.25;
+    player.body.gravity.y = 300;
+
+	//  Start the game.
+	game.physics.arcade.isPaused = false;
+	gameStarted = true;
+}
+
+//  Third stage in Phaser, update positions of objects and render properly on screen.
+function update() {
+	
+	//  Update nothing if game has not yet started.
+	if (!gameStarted){
+		return;
 	}
 
-	//  Display objects
-	var player;
-	var layer;
-	//var stars;
-	var door;
-	var map;
+    //  Collide the player and the stars with the platforms
+    //game.physics.arcade.collide(stars, layer);
 
-	//  Input means
-	var cursors;
+    //  Checks to see if the player overlaps with any of the stars, if he does call the collectStar function
+    //  game.physics.arcade.overlap(player, stars, collectStar, null, this);
 
-	//  Game status
-	var gameStarted = false;
-	var currentLevel = 1;
-	var score = 0;
-	var scoreText;
-	var lifeText;
-
-	//  Data
-	var phaserJSON;
-
-	//  Second stage in phaser, load more map files according to leveldata.JSON
-	function load(){
-
-		//  Read file names from the main JSON file containing level names.
-		phaserJSON = game.cache.getJSON('leveldata');
-		var data = phaserJSON.leveldata;
-		totalLevels = data.length;
-		//  Load the corresponding files for maps.
-		for (var i = 1; i <= totalLevels; i++){
-			//  e. g. Load 'assets/map-hearts.json' for "name": hearts in leveldata.JSON
-			var file = 'assets/map-' + phaserJSON.leveldata[i-1].name + '.json';
-			game.load.tilemap('level' + i, file, null, Phaser.Tilemap.TILED_JSON);
-		}
-
-		//  Manually start loading after preload.
-		game.load.start();
-
-		//  When finished loading all maps, call create().
-		game.load.onLoadComplete.add(create, this);
+	// Add drag force to the player.
+	player.body.velocity.x = 0;
+    var hitLayer = game.physics.arcade.collide(player, layer);	
+    if (cursors.left.isDown)  //  Move to the left
+    {
+        player.body.velocity.x = -117;
+        player.animations.play('left');
+    }
+    else if (cursors.right.isDown)  //  Move to the right
+    {
+        player.body.velocity.x = 117;
+        player.animations.play('right');
+    }
+    else  //  Stand still
+    {
+        player.animations.stop();
+        player.frame = 2;
+    }
+	
+	//  Player dies while falling out of screen area.
+    if (player.y > game.world.height && player.health > 0) {
+    	playerDies();
+    }
+	
+	//  Stop walking if in air
+	if (!hitLayer){
+		player.animations.stop();
 	}
 
-	//  Load the rest of stuffs for the game.
-	function create() {
+    //  Allow the player to jump if they are touching the blocks (layer) or the platform.
+    if (cursors.up.isDown && hitLayer)
+    {
+    	player.body.velocity.y = -200;
+    }
+	
+	// Checks to see if the player reaches the door
+	game.physics.arcade.overlap(player, door, reachDoor, radiusCheck, this);
 
-		//  Here is when update() starts to loop because create() is completed.
-		//  Therefore we use bool variable gameStared to control whether update() should do its thing.
+}
 
-		//  Background image.
-		game.add.sprite(0, 0, 'bg');
+//  Based on currentLevel, load blocks from the coresponding map.
+function loadMap () {
+	//  Add blocks as a tile sprite.
+    map = game.add.tilemap('level' + currentLevel);
+    map.addTilesetImage('block');
+    map.setCollisionByExclusion([ 13, 14, 15, 16, 46, 47, 48, 49, 50, 51 ]);
+    layer = map.createLayer('Tile Layer 1');
+	
+	//  Finally some stars to collect
+    //stars = game.add.group();
+	
+    //  Here we'll create 12 of them evenly spaced apart
+    //for (var i = 0; i < 12; i++)
+    //{
+        //  Create a star inside of the 'stars' group
+        //var star = stars.create(i * 70, 0, 'star');
 
-		//  Add map.
-		loadMap ();
+        //  Let gravity do its thing
+        //star.body.gravity.y = 300;
 
-		//  Add player and door.
-		player = game.add.sprite(phaserJSON.leveldata[currentLevel-1].player_x, phaserJSON.leveldata[currentLevel-1].player_y, 'dude');
-		door = game.add.sprite(phaserJSON.leveldata[currentLevel-1].door_x, phaserJSON.leveldata[currentLevel-1].door_y, 'bubble');
+        //  This just gives each star a slightly random bounce value
+        //star.body.bounce.y = 0.7 + Math.random() * 0.2;
+    //}	
 
-		//  Set player's animations for walking.
-		player.animations.add('left', [0, 1], 10, true);
-		player.animations.add('right', [3, 4], 10, true);
+}
 
-		//  Add Texts.
-		player.health = 9;
-		scoreText = game.add.text(game.width - 30 - 100, 40, 'Score: 0', { fontSize: '32px', fill: '#000' });
-		lifeText = game.add.text(game.width - 30 - 100, 10, 'Life: 9', { fontSize: '32px', fill: '#000' });
+//  Called to collect a star when player hits it.
+function collectStar (player, star) {
+    //  Removes the star from the screen
+    //star.destroy();
 
-		//  Set input controls.
-		cursors = game.input.keyboard.createCursorKeys();
+    //  Add and update the score.
+    score += 10;
+    scoreText.text = 'Score: ' + score;
+}
 
-		//  Turn on Physics.
-		game.physics.startSystem(Phaser.Physics.ARCADE);
-		game.physics.arcade.isPaused = true;
-
-		//  Set physics properties for items.
-		game.physics.arcade.enable(player);
-		game.physics.arcade.enable(door);
-		player.body.bounce.y = 0.25;
-		player.body.gravity.y = 300;
-
-		//  Start the game.
-		game.physics.arcade.isPaused = false;
-		gameStarted = true;
-	}
-
-	//  Third stage in Phaser, update positions of objects and render properly on screen.
-	function update() {
-
-		//  Update nothing if game has not yet started.
-		if (!gameStarted){
-			return;
-		}
-
-		//  Collide the player and the stars with the platforms
-		//game.physics.arcade.collide(stars, layer);
-
-		//  Checks to see if the player overlaps with any of the stars, if he does call the collectStar function
-		//  game.physics.arcade.overlap(player, stars, collectStar, null, this);
-
-		// Add drag force to the player.
-		player.body.velocity.x = 0;
-		var hitLayer = game.physics.arcade.collide(player, layer);
-		if (cursors.left.isDown)  //  Move to the left
-		{
-			player.body.velocity.x = -117;
-			player.animations.play('left');
-		}
-		else if (cursors.right.isDown)  //  Move to the right
-		{
-			player.body.velocity.x = 117;
-			player.animations.play('right');
-		}
-		else  //  Stand still
-		{
-			player.animations.stop();
-			player.frame = 2;
-		}
-
-		//  Player dies while falling out of screen area.
-		if (player.y > game.world.height && player.health > 0) {
-			playerDies();
-		}
-
-		//  Stop walking if in air
-		if (!hitLayer){
-			player.animations.stop();
-		}
-
-		//  Allow the player to jump if they are touching the blocks (layer) or the platform.
-		if (cursors.up.isDown && hitLayer)
-		{
-			player.body.velocity.y = -200;
-		}
-
-		// Checks to see if the player reaches the door
-		game.physics.arcade.overlap(player, door, reachDoor, null, this);
-
-	}
-
-	//  Based on currentLevel, load blocks from the coresponding map.
-	function loadMap () {
-		//  Add blocks as a tile sprite.
-		map = game.add.tilemap('level' + currentLevel);
-		map.addTilesetImage('block');
-		map.setCollisionByExclusion([ 13, 14, 15, 16, 46, 47, 48, 49, 50, 51 ]);
-		layer = map.createLayer('Tile Layer 1');
-
-		//  Finally some stars to collect
-		//stars = game.add.group();
-
-		//  Here we'll create 12 of them evenly spaced apart
-		//for (var i = 0; i < 12; i++)
-		//{
-		//  Create a star inside of the 'stars' group
-		//var star = stars.create(i * 70, 0, 'star');
-
-		//  Let gravity do its thing
-		//star.body.gravity.y = 300;
-
-		//  This just gives each star a slightly random bounce value
-		//star.body.bounce.y = 0.7 + Math.random() * 0.2;
-		//}
-
-	}
-
-	//  Called to collect a star when player hits it.
-	function collectStar (player, star) {
-		//  Removes the star from the screen
-		//star.destroy();
-
-		//  Add and update the score.
-		score += 10;
-		scoreText.text = 'Score: ' + score;
-	}
-
-	//  Called when player touches the door.
-	function reachDoor (player, door){
+//  Called when player touches the door.
+function reachDoor (player, door){
+	//  We use bool variable doorReached to delay several loops for rendering.
+	//  Simply calling nextLevel() will result in display of player still far from door.
+	if (doorReached >= 10) {
+		doorReached = 0;
 		nextLevel();
+	} else {
+		doorReached ++;
 	}
+}
 
-	//  Clean the old map and load a new one.
-	function nextLevel () {
-		alert("Good job! ");
+//  Clean the old map and load a new one.
+function nextLevel () {
+	alert("Good job! ");
+	
+	//  If it's the last level, don't load.
+	if (currentLevel >= totalLevels){
+		alert("Completed all levels! ");
+		return;
+	}
+	
+	//  Pause the game. The map takes a while to render and we don't want objects still move around.
+	gameStarted = false;
+	
+	//  Clean up the last level.
+    layer.destroy();
+	//stars.removeAll(); //soft destroy
+	
+	//  Load next level.
+    currentLevel +=1;	
+    player.reset(phaserJSON.leveldata[currentLevel-1].player_x, phaserJSON.leveldata[currentLevel-1].player_y, player.health);
+	door.reset(phaserJSON.leveldata[currentLevel-1].door_x, phaserJSON.leveldata[currentLevel-1].door_y, player.health, door.health);
+	loadMap ();
+	
+	//  Start the game.
+	gameStarted = true;
+}
 
-		//  If it's the last level, don't load.
-		if (currentLevel >= totalLevels){
-			alert("Completed all levels! ");
-			return;
+//  Called when the player dies.
+function playerDies(){
+	//  Put player back in the original place and recalculate player's health.
+	player.reset(phaserJSON.leveldata[currentLevel-1].player_x, phaserJSON.leveldata[currentLevel-1].player_y, player.health-1);
+	
+	//  Update player's health.
+	lifeText.text = 'Life: ' + player.health;
+}
+
+// Model two objects as circles and return true if they overlap.
+function radiusCheck(body1, body2){
+	var radius1 = body1.width * 0.45;
+	var radius2 = body2.width * 0.45;
+	if(Math.abs(body1.x - body2.x) < radius1 + radius2 &&
+		Math.abs(body1.y - body2.y) < radius1 + radius2){
+		var distance = game.physics.arcade.distanceBetween(body1, body2);
+		if (distance < (radius1 + radius2) * (radius1 + radius2)){
+		    return true;
 		}
-
-		//  Clean up the last level.
-		layer.destroy();
-		//stars.removeAll(); //soft destroy
-
-		//  Load next level.
-		currentLevel +=1;
-		player.reset(phaserJSON.leveldata[currentLevel-1].player_x, phaserJSON.leveldata[currentLevel-1].player_y, player.health);
-		door.reset(phaserJSON.leveldata[currentLevel-1].door_x, phaserJSON.leveldata[currentLevel-1].door_y, player.health, door.health);
-		loadMap ();
 	}
-
-	//  Called when the player dies.
-	function playerDies(){
-		//  Put player back in the original place and recalculate player's health.
-		player.reset(phaserJSON.leveldata[currentLevel-1].player_x, phaserJSON.leveldata[currentLevel-1].player_y, player.health-1);
-
-		//  Update player's health.
-		lifeText.text = 'Life: ' + player.health;
-	}
-
+	return false;
+}
 	</script>
 
 </body>
