@@ -51,10 +51,18 @@ var score = 0;
 var scoreText;
 var lifeText;
 
+//  Data
+var phaserJSON;
+
 function load(){
 	
+	//  Turn on Physics
+	//alert("Start game? ");
+    game.physics.startSystem(Phaser.Physics.ARCADE);
+	game.physics.arcade.isPaused = true;
+	
 	//  Read file names from the main JSON file containing level names.
-	var phaserJSON = game.cache.getJSON('leveldata');
+	phaserJSON = game.cache.getJSON('leveldata');
 	var data = phaserJSON.leveldata;
 	totalLevels = data.length;
 	for (var i = 1; i <= totalLevels; i++){
@@ -78,8 +86,8 @@ function create() {
 	loadMap ();
 	
     //  Add player and door
-    player = game.add.sprite(32, 0, 'dude');
-	door = game.add.sprite(120, 250, 'bubble');
+    player = game.add.sprite(phaserJSON.leveldata[currentLevel-1].player_x, phaserJSON.leveldata[currentLevel-1].player_y, 'dude');
+	door = game.add.sprite(phaserJSON.leveldata[currentLevel-1].door_x, phaserJSON.leveldata[currentLevel-1].door_y, 'bubble');
 
     //  Set player's animations for walking.
     player.animations.add('left', [0, 1], 10, true);
@@ -93,16 +101,13 @@ function create() {
     //  Set controls
     cursors = game.input.keyboard.createCursorKeys();
 	
-	//  Turn on Physics
-    game.physics.startSystem(Phaser.Physics.ARCADE);
-	
 	//  Set physics properties
 	game.physics.arcade.enable(player);
 	game.physics.arcade.enable(door);
     player.body.bounce.y = 0.25;
     player.body.gravity.y = 300;
     //player.body.collideWorldBounds = true;	
-
+	game.physics.arcade.isPaused = false;
 }
 
 function update() {
@@ -112,9 +117,7 @@ function update() {
 
     //  Checks to see if the player overlaps with any of the stars, if he does call the collectStar function
     //  game.physics.arcade.overlap(player, stars, collectStar, null, this);
-
-	// Checks to see if the player reaches the door
-	game.physics.arcade.overlap(player, door, reachDoor, null, this);
+	
     //  Reset the players velocity (movement)
     player.body.velocity.x = 0;
 	
@@ -150,6 +153,9 @@ function update() {
     {
     	player.body.velocity.y = -200;
     }
+	
+	// Checks to see if the player reaches the door
+	game.physics.arcade.overlap(player, door, reachDoor, null, this);
 
 }
 
@@ -188,12 +194,15 @@ function collectStar (player, star) {
 }
 
 function reachDoor (player, door){
-	console.log("door");
 	nextLevel();
 }
 
 function nextLevel () {
 	alert("Good job! ");
+	
+	if (currentLevel >= totalLevels){
+		alert("Completed all levels! ");
+	}
 	
 	//  Clean up the last level.
     layer.destroy();
@@ -202,14 +211,15 @@ function nextLevel () {
 	//stars.removeAll();
 	
 	//  Load next level.
-    player.reset(32, 0, player.health);
-    currentLevel +=1;
+    currentLevel +=1;	
+    player.reset(phaserJSON.leveldata[currentLevel-1].player_x, phaserJSON.leveldata[currentLevel-1].player_y, player.health);
+	door.reset(phaserJSON.leveldata[currentLevel-1].door_x, phaserJSON.leveldata[currentLevel-1].door_y, player.health, door.health);
 	loadMap ();
 }
 
 function playerDies(){
 	//  Put player back in the original place.
-	player.reset(32, 0, player.health-1);
+	player.reset(phaserJSON.leveldata[currentLevel-1].player_x, phaserJSON.leveldata[currentLevel-1].player_y, player.health-1);
 	lifeText.text = 'Life: ' + player.health;
 }
 
