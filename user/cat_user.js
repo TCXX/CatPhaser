@@ -16,6 +16,8 @@ $("#login_btn").click(function() {
         // After user is logged in, show username, logout button and addEvent form.
         document.getElementById("ShowUser").innerHTML = username;
         document.getElementById("logout_btn").style.display = 'block';
+        document.getElementById("scorePrompt").style.display = 'block';
+        document.getElementById("score").innerHTML = 0;
       } else {
         alert(jsonData.message);
       }
@@ -40,6 +42,8 @@ $("#register_btn").click(function() {
         // After user is logged in, show username, logout button and addEvent form.
         document.getElementById("ShowUser").innerHTML = username;
         document.getElementById("logout_btn").style.display = 'block';
+        document.getElementById("scorePrompt").style.display = 'block';
+        document.getElementById("score").innerHTML = 0;
       } else {
         alert(jsonData.message);
       }
