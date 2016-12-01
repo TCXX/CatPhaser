@@ -1,23 +1,30 @@
 {"leveldata": [
     {
         "name": "hearts",
-        "player_x": 0,
-        "player_y": 32,
-        "door_x": 120,
-        "door_y": 250
+        "player_x": 32,
+        "player_y": 0,
+        "door_x": 240,
+        "door_y": -10
     },
     {
         "name": "cafe",
-        "player_x": 0,
-        "player_y": 32,
-        "door_x": 120,
+        "player_x": 40,
+        "player_y": 0,
+        "door_x": 100,
         "door_y": 250
     },
     {
         "name": "tree",
-        "player_x": 0,
-        "player_y": 32,
-        "door_x": 120,
-        "door_y": 250
+        "player_x": 215,
+        "player_y": 200,
+        "door_x": 260,
+        "door_y": 30
+    },
+    {
+        "name": "myVille",
+        "player_x": 50,
+        "player_y": 0,
+        "door_x": 250,
+        "door_y": 230
     }
 ]}
