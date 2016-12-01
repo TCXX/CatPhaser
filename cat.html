@@ -76,7 +76,10 @@ var cursors;
 
 //  Game status
 var gameStarted = false;
-var doorReached = 0;
+var doorReached = false;
+var doorDelay = 0;
+
+//  Game process
 var currentLevel = 1;
 var score = 0;
 var scoreText;
@@ -201,6 +204,19 @@ function update() {
 	
 	// Checks to see if the player reaches the door
 	game.physics.arcade.overlap(player, door, reachDoor, radiusCheck, this);
+	
+	//  We use bool variable doorReached to delay several loops for rendering.
+	//  Simply calling nextLevel() will result in display of player still far from door.
+	if (doorReached) {
+		doorDelay ++;
+		if (doorDelay>30){
+			doorReached = false;
+			doorDelay = 0;
+			nextLevel();
+		} else {
+			doorDelay ++;
+		}
+	} 
 
 }
 
@@ -242,14 +258,7 @@ function collectStar (player, star) {
 
 //  Called when player touches the door.
 function reachDoor (player, door){
-	//  We use bool variable doorReached to delay several loops for rendering.
-	//  Simply calling nextLevel() will result in display of player still far from door.
-	if (doorReached >= 10) {
-		doorReached = 0;
-		nextLevel();
-	} else {
-		doorReached ++;
-	}
+	doorReached = true;
 }
 
 //  Clean the old map and load a new one.
@@ -290,8 +299,8 @@ function playerDies(){
 
 // Model two objects as circles and return true if they overlap.
 function radiusCheck(body1, body2){
-	var radius1 = body1.width * 0.45;
-	var radius2 = body2.width * 0.45;
+	var radius1 = body1.width;
+	var radius2 = body2.width;
 	if(Math.abs(body1.x - body2.x) < radius1 + radius2 &&
 		Math.abs(body1.y - body2.y) < radius1 + radius2){
 		var distance = game.physics.arcade.distanceBetween(body1, body2);
