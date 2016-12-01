@@ -1,0 +1,23 @@
+{"leveldata": [
+    {
+        "name": "hearts",
+        "player_x": 0,
+        "player_y": 32,
+        "door_x": 120,
+        "door_y": 250
+    },
+    {
+        "name": "cafe",
+        "player_x": 0,
+        "player_y": 32,
+        "door_x": 120,
+        "door_y": 250
+    },
+    {
+        "name": "tree",
+        "player_x": 0,
+        "player_y": 32,
+        "door_x": 120,
+        "door_y": 250
+    }
+]}
