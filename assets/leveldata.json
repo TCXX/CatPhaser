@@ -4,7 +4,11 @@
         "player_x": 32,
         "player_y": 0,
         "door_x": 240,
-        "door_y": -10
+        "door_y": -10,
+        "items": [
+            {"type": "star", "item_x": 100, "item_y": 100},
+            {"type": "star", "item_x": 150, "item_y": 150}
+        ]
     },
     {
         "name": "cafe",
@@ -12,6 +16,13 @@
         "player_y": 0,
         "door_x": 100,
         "door_y": 250
+    },
+    {
+        "name": "stones",
+        "player_x": 32,
+        "player_y": 0,
+        "door_x": 580,
+        "door_y": 90
     },
     {
         "name": "tree",
