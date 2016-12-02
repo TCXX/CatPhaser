@@ -36,6 +36,18 @@ $stmt->bind_param('ss', $username, $password);
 $stmt->execute();
 $stmt->close();
 
+$stmt2 = $mysqli->prepare("INSERT INTO userScores(username, score) values (?,0)");
+if(!$stmt2){
+	printf("Query Prep Failed: %s\n", $mysqli->error);
+	exit;
+}
+
+$stmt2->bind_param('s', $username);
+
+$stmt2->execute();
+
+$stmt2->close();
+
 session_start();
 ini_set("session.cookie_httponly", 1);
 $_SESSION['username'] = $username;

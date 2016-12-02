@@ -69,7 +69,7 @@ $("#sync_btn").click(function() {
     console.log("in if");
     $.ajax({
       url: "user/updateScore.php",
-      type: "get",
+      type: "post",
       data: {"username": username, "gameHighest": gameHighest},
       success: function(data){
         console.log("data");
