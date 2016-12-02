@@ -49,6 +49,19 @@
 	<script type="text/javascript">
 
 
+//  GameItem class extending Phaser.Sprite
+GameItem = function (x, y, itemType) {
+    Phaser.Sprite.call(this, game, x, y, itemType);
+	this.itemType = itemType;
+	items.add(this);
+	
+	game.physics.arcade.enable(this);
+	this.body.gravity.y = 300;
+	this.body.bounce.y = 0.7 + Math.random() * 0.2;
+};
+GameItem.prototype = Object.create(Phaser.Sprite.prototype);
+GameItem.prototype.constructor = GameItem;
+
 //  Variables needed for preload.
 var game = new Phaser.Game(825, 600, Phaser.AUTO, '', { preload: preload, create: load, update: update });
 var totalLevels;
@@ -56,7 +69,7 @@ var totalLevels;
 //  First stage in Phaser, load resources from server.
 function preload() {
 	game.load.json('leveldata', 'assets/leveldata.json');
-
+	
 	game.load.image('bg', 'assets/bg.png');
     game.load.image('block', 'assets/block.png');
     game.load.image('star', 'assets/star.png');
@@ -93,43 +106,43 @@ var phaserJSON;
 
 //  Second stage in phaser, load more map files according to leveldata.JSON
 function load(){
-
+	
 	//  Read file names from the main JSON file containing level names.
 	phaserJSON = game.cache.getJSON('leveldata');
 	var data = phaserJSON.leveldata;
 	totalLevels = data.length;
-
+	
 	//  Load the corresponding files for maps.
 	for (var i = 1; i <= totalLevels; i++){
 		//  e. g. Load 'assets/map-hearts.json' for "name": hearts in leveldata.JSON
 		var file = 'assets/map-' + phaserJSON.leveldata[i-1].name + '.json';
 		game.load.tilemap('level' + i, file, null, Phaser.Tilemap.TILED_JSON);
 	}
-
+	
 	//  Manually start loading after preload.
 	game.load.start();
-
+	
 	//  Turn on Physics.
     game.physics.startSystem(Phaser.Physics.ARCADE);
 	game.physics.arcade.isPaused = true;
-
+	
 	//  Here is when update() starts to loop because create() is completed.
 	//  Therefore we use bool variable isPaused to control whether update() should do its thing.
-
+	
 	//  When finished loading all maps, call create().
-	game.load.onLoadComplete.add(create, this);
-
+	game.load.onLoadComplete.add(create, this);	
+	
 }
 
 //  Load the rest of stuffs for the game.
 function create() {
-
+	
     //  Background image.
     bg = game.add.sprite(0, 0, 'bg');
-
+	
 	//  Add map.
 	loadMap ();
-
+	
     //  Add player and door.
     player = game.add.sprite(phaserJSON.leveldata[currentLevel-1].player_x, phaserJSON.leveldata[currentLevel-1].player_y, 'dude');
 	door = game.add.sprite(phaserJSON.leveldata[currentLevel-1].door_x, phaserJSON.leveldata[currentLevel-1].door_y, 'bubble');
@@ -146,7 +159,7 @@ function create() {
 
     //  Set input controls.
     cursors = game.input.keyboard.createCursorKeys();
-
+	
 	//  Set physics properties for items.
 	game.physics.arcade.enable(player);
 	game.physics.arcade.enable(door);
@@ -161,17 +174,16 @@ function create() {
 function update() {
 
 	//  Update nothing if game has not yet started.
-	if (game.physics.arcade.isPaused){
-		return;
-	}
+	if (game.physics == null) return;
+	if (game.physics.arcade.isPaused) return;
 
     //  Collision checks.
 	var hitLayer;
 	game.physics.arcade.collide(items, layer);
-	game.physics.arcade.overlap(player, items, collectStar, null, this);
-	hitLayer = game.physics.arcade.collide(player, layer);
+	game.physics.arcade.overlap(player, items, collectItem, null, this);
+	hitLayer = game.physics.arcade.collide(player, layer);	
 
-
+	
 	// Add drag force to the player.
 	player.body.velocity.x = 0;
     if (cursors.left.isDown)  //  Move to the left
@@ -189,12 +201,18 @@ function update() {
         player.animations.stop();
         player.frame = 2;
     }
-
+	
+    //  Allow the player to jump if they are touching the blocks (layer) or the platform.
+    if (cursors.up.isDown && hitLayer)
+    {
+    	player.body.velocity.y = -200;
+    }	
+	
 	//  Player dies while falling out of screen area.
     if (player.y > game.world.height && player.health > 0) {
     	playerDies();
     }
-
+	
 	//  Items disappears while falling out of screen area.
 	for (var i = 0; i < items.children.length; i++)
     {
@@ -202,22 +220,16 @@ function update() {
         if (item.y > game.world.height){
 			item.destroy();
 		}
-    }
-
+    }	
+	
 	//  Stop walking if in air
 	if (!hitLayer){
 		player.animations.stop();
 	}
-
-    //  Allow the player to jump if they are touching the blocks (layer) or the platform.
-    if (cursors.up.isDown && hitLayer)
-    {
-    	player.body.velocity.y = -200;
-    }
-
+	
 	// Checks to see if the player reaches the door
 	game.physics.arcade.overlap(player, door, reachDoor, radiusCheck, this);
-
+	
 	//  We use bool variable doorReached to delay several loops for rendering.
 	//  Simply calling nextLevel() will result in display of player still far from door.
 	if (doorReached) {
@@ -229,9 +241,8 @@ function update() {
 		} else {
 			doorDelay ++;
 		}
-	}
-	// Update and show the current highest score of the user.
-	updateScore();
+	} 
+
 }
 
 //  Based on currentLevel, load blocks from the coresponding map.
@@ -241,38 +252,41 @@ function loadMap () {
     map.addTilesetImage('block');
     map.setCollisionByExclusion([ 13, 14, 15, 16, 46, 47, 48, 49, 50, 51 ]);
     layer = map.createLayer('Tile Layer 1');
-
+	
+	//layer.fixedToCamera = false;
+	//layer.x=30;
+	
 	//  Load additional items.
     items = game.add.group();
     for (var i = 0; i < 12; i++)
     {
-        var item = items.create(i * 60 + 30, 0, 'star');
-		game.physics.arcade.enable(item);
-        item.body.gravity.y = 300;
-        item.body.bounce.y = 0.7 + Math.random() * 0.2;
+        new GameItem(i * 60 + 30, 0, 'star');
     }
-
+	
 	// Load more items based on leveldata.
 	if (!(phaserJSON.leveldata[currentLevel-1].items==null)){
 		for (i=0; i < phaserJSON.leveldata[currentLevel-1].items.length; i++){
 			var x = phaserJSON.leveldata[currentLevel-1].items[i].item_x;
 			var y = phaserJSON.leveldata[currentLevel-1].items[i].item_y;
-			var item = items.create(x, y, 'diamond');
-			game.physics.arcade.enable(item);
-			item.body.gravity.y = 300;
-			item.body.bounce.y = 0.7 + Math.random() * 0.2;
+			new GameItem(x, y, phaserJSON.leveldata[currentLevel-1].items[i].type);
 		}
 	}
 
 
 }
 
-//  Called to collect a star when player hits it.
-function collectStar (player, item) {
+//  Called to collect an item when player hits it.
+function collectItem (player, item) {
+	if(item.itemType == 'star'){
+		score += 10;
+		scoreText.text = 'Score: ' + score;		
+	} else if (item.itemType == 'diamond'){
+		player.health ++;
+		lifeText.text = 'Life: ' + player.health;
+	}
+	
     item.destroy();
-
-    score += 10;
-    scoreText.text = 'Score: ' + score;
+		
 }
 
 //  Called when player touches the door.
@@ -283,24 +297,24 @@ function reachDoor (player, door){
 //  Clean the old map and load a new one.
 function nextLevel () {
 	alert("Good job! ");
-
+	
 	//  If it's the last level, don't load.
 	if (currentLevel >= totalLevels){
 		alert("Completed all levels! ");
 		game.physics.arcade.isPaused = true;
 		return;
 	}
-
+	
 	//  Clean up the last level.
     layer.destroy();
 	items.removeAll(); //soft destroy
-
+	
 	//  Load next level.
     currentLevel +=1;
+	loadMap ();
     player.reset(phaserJSON.leveldata[currentLevel-1].player_x, phaserJSON.leveldata[currentLevel-1].player_y, player.health);
 	door.reset(phaserJSON.leveldata[currentLevel-1].door_x, phaserJSON.leveldata[currentLevel-1].door_y, player.health, door.health);
-	loadMap ();
-
+	
 	//  Start the game.
 	game.physics.arcade.isPaused = false;
 }
@@ -309,7 +323,7 @@ function nextLevel () {
 function playerDies(){
 	//  Put player back in the original place and recalculate player's health.
 	player.reset(phaserJSON.leveldata[currentLevel-1].player_x, phaserJSON.leveldata[currentLevel-1].player_y, player.health-1);
-
+	
 	//  Update player's health.
 	lifeText.text = 'Life: ' + player.health;
 }
@@ -329,16 +343,6 @@ function radiusCheck(body1, body2){
 	return false;
 }
 
-// Update the highest score of the user.
-function updateScore(){
-		var currentHighest = document.getElementById("score").innerHTML;
-		console.log(currentHighest);
-		console.log(score);
-		if (score > currentHighest){
-			document.getElementById("score").innerHTML = score;
-		}
-
-}
 
 	</script>
 	<script type="text/javascript" src="user/cat_user.js"></script>
