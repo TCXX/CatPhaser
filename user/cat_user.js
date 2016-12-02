@@ -81,5 +81,12 @@ $("#sync_btn").click(function() {
         }
       }
     });
+    // $.post("user/updateScore.php", {
+    //               username: username,
+    //               gameHighest: gameHighest
+    //           }, function () {
+    //               console.log("update Back");
+    //   });
   }
+
 });

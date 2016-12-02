@@ -36,6 +36,7 @@ $stmt->bind_param('ss', $username, $password);
 $stmt->execute();
 $stmt->close();
 
+// Set the score of the new user 0 in the database initially.
 $stmt2 = $mysqli->prepare("INSERT INTO userScores(username, score) values (?,0)");
 if(!$stmt2){
 	printf("Query Prep Failed: %s\n", $mysqli->error);
