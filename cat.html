@@ -46,6 +46,7 @@
 
 	<script type="text/javascript">
 
+
 //  Variables needed for preload.
 var game = new Phaser.Game(825, 600, Phaser.AUTO, '', { preload: preload, create: load, update: update });
 var totalLevels;
@@ -164,11 +165,10 @@ function update() {
 
     //  Collision checks.
 	var hitLayer;
-    if (items.children.length>0){
-		game.physics.arcade.collide(items, layer);
-		game.physics.arcade.overlap(player, items, collectStar, null, this);
-		hitLayer = game.physics.arcade.collide(player, layer);	
-	}
+	game.physics.arcade.collide(items, layer);
+	game.physics.arcade.overlap(player, items, collectStar, null, this);
+	hitLayer = game.physics.arcade.collide(player, layer);	
+
 	
 	// Add drag force to the player.
 	player.body.velocity.x = 0;
@@ -251,7 +251,6 @@ function loadMap () {
 	
 	// Load more items based on leveldata.
 	if (!(phaserJSON.leveldata[currentLevel-1].items==null)){
-		alert(phaserJSON.leveldata[currentLevel-1].items);
 		for (i=0; i < phaserJSON.leveldata[currentLevel-1].items.length; i++){
 			var x = phaserJSON.leveldata[currentLevel-1].items[i].item_x;
 			var y = phaserJSON.leveldata[currentLevel-1].items[i].item_y;
@@ -327,7 +326,7 @@ function radiusCheck(body1, body2){
 	return false;
 }
 
-		
+	
 	</script>
 
 </body>
