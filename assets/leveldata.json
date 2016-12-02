@@ -3,10 +3,9 @@
         "name": "hearts",
         "player_x": 32,
         "player_y": 0,
-        "door_x": 240,
-        "door_y": -10,
+        "door_x": 540,
+        "door_y": 120,
         "items": [
-            {"type": "star", "item_x": 100, "item_y": 100},
             {"type": "star", "item_x": 150, "item_y": 150}
         ]
     },
@@ -15,7 +14,12 @@
         "player_x": 40,
         "player_y": 0,
         "door_x": 100,
-        "door_y": 250
+        "door_y": 250,
+        "items": [
+            {"type": "diamond", "item_x": 600, "item_y": 100},
+            {"type": "star", "item_x": 150, "item_y": 150},
+            {"type": "star", "item_x": 390, "item_y": 220}
+        ]
     },
     {
         "name": "stones",
