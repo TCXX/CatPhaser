@@ -13,10 +13,11 @@ $("#logout_btn").click(function() {
 				alert("Logout successfully");
 				// After the user is logged out, hide logout button and addEvent and display login block again.
 				document.getElementById("logout_btn").style.display = 'none';
+				document.getElementById("Login").style.display = 'block';
 				document.getElementById("scorePrompt").style.display = 'none';
 				document.getElementById("score").style.display = 'none';
 				document.getElementById("ShowUser").innerHTML = "";
-				document.getElementById("Login").style.display = 'block';
+
 			}
 		}
 	});

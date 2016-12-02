@@ -36,4 +36,7 @@ if($cnt == 1 && crypt($pwd_guess, $pwd_hash)==$pwd_hash){
 	));
 	exit;
 }
+
+// Get the highest score of the user from the Database.
+
 ?>
