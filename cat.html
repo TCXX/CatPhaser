@@ -45,7 +45,7 @@
 		<button id="sync_btn">Sync my score</button> <br>
 	</div>
 	<script type="text/javascript" src="user/Logout.js"></script>
-
+	<script type="text/javascript" src="user/cat_user.js"></script>
 	<script type="text/javascript">
 
 	//  GameItem class extending Phaser.Sprite
@@ -153,9 +153,9 @@
 		player.animations.add('right', [3, 4], 10, true);
 
 		//  Add Texts.
-		player.health = 1;
+		player.health = 9;
 		scoreText = game.add.text(game.width - 30 - 100, 40, 'Score: 0', { fontSize: '32px', fill: '#000' });
-		lifeText = game.add.text(game.width - 30 - 100, 10, 'Life: 1', { fontSize: '32px', fill: '#000' });
+		lifeText = game.add.text(game.width - 30 - 100, 10, 'Life: 9', { fontSize: '32px', fill: '#000' });
 
 		//  Set input controls.
 		cursors = game.input.keyboard.createCursorKeys();
@@ -209,7 +209,7 @@
 		}
 
 		//  Player dies while falling out of screen area.
-		if (player.y > game.world.height && player.health > 0) {
+		if (player.y > game.world.height && player.health >= 0) {
 			playerDies();
 		}
 
@@ -245,7 +245,10 @@
 		updateScore();
 		if (player.health < 0){
 			gameOver = true;
+			game.physics.arcade.isPaused = true;
 			document.getElementById("gameOver").innerHTML = gameOver;
+			console.log(score);
+			document.getElementById("score").innerHTML = score;
 		}
 	}
 
@@ -358,6 +361,6 @@
 	}
 
 	</script>
-	<script type="text/javascript" src="user/cat_user.js"></script>
+
 </body>
 </html>

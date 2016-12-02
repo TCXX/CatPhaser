@@ -1,9 +1,6 @@
 <?php
 require 'Database.php';
 
-header("Content-Type: application/json");
-ini_set("session.cookie_httponly", 1);
-
 $user = $_POST['username'];
 $gameHighest = $_POST['gameHighest'];
 
@@ -19,9 +16,9 @@ $stmt->execute();
 
 $stmt->close();
 
-// echo json_encode(array(
-//   "success" => true,
-//   "gameHighest" => $gameHighest
-// ));
+echo json_encode(array(
+  "success" => true,
+  "gameHighest" => $gameHighest
+));
 exit;
 ?>
