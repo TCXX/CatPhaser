@@ -5,6 +5,7 @@
 require 'Database.php';
 $user = $_POST['username'];
 $pwd_guess = $_POST['password'];
+
 //Use a prepared statement
 $stmt = $mysqli->prepare("SELECT COUNT(*), username, cpassword FROM users WHERE username=?");
 
@@ -14,9 +15,23 @@ $stmt->execute();
 // Bind the results
 $stmt->bind_result($cnt, $user_id, $pwd_hash);
 $stmt->fetch();
+$stmt->close();
 
-// Check to see if the username and password are valid.  (You learned how to do this in Module 3.)
+// Get the score of the user.
+$stmt2 = $mysqli->prepare("SELECT score FROM userScores WHERE username=?");
+if(!$stmt2){
+	printf("Query Prep Failed: %s\n", $mysqli->error);
+	exit;
+}
 
+// Bind the parameter
+$stmt2->bind_param('s', $user);
+$stmt2->execute();
+// Bind the results
+$stmt2->bind_result($max_score);
+$stmt2->fetch();
+
+// Check to see if the username and password are valid.
 if($cnt == 1 && crypt($pwd_guess, $pwd_hash)==$pwd_hash){
 	ini_set("session.cookie_httponly", 1);
 	session_start();
@@ -25,7 +40,7 @@ if($cnt == 1 && crypt($pwd_guess, $pwd_hash)==$pwd_hash){
 
 	echo json_encode(array(
 		"success" => true,
-		"username" => $_SESSION['username'],
+		"max_score" => $max_score,
 		"token" => $_SESSION['token']
 	));
 	exit;
@@ -36,7 +51,5 @@ if($cnt == 1 && crypt($pwd_guess, $pwd_hash)==$pwd_hash){
 	));
 	exit;
 }
-
-// Get the highest score of the user from the Database.
 
 ?>

@@ -1,3 +1,5 @@
+// max_score is the highest score in the database.
+var max_score;
 // Login
 // When user hit the login button:
 $("#login_btn").click(function() {
@@ -17,7 +19,9 @@ $("#login_btn").click(function() {
         document.getElementById("ShowUser").innerHTML = username;
         document.getElementById("logout_btn").style.display = 'block';
         document.getElementById("scorePrompt").style.display = 'block';
-        document.getElementById("score").innerHTML = 0;
+        max_score = jsonData.max_score;
+        document.getElementById("score").style.display = 'block';
+        document.getElementById("score").innerHTML = jsonData.max_score;
       } else {
         alert(jsonData.message);
       }
@@ -43,10 +47,39 @@ $("#register_btn").click(function() {
         document.getElementById("ShowUser").innerHTML = username;
         document.getElementById("logout_btn").style.display = 'block';
         document.getElementById("scorePrompt").style.display = 'block';
+        document.getElementById("score").style.display = 'block';
         document.getElementById("score").innerHTML = 0;
+        max_score = 0;
       } else {
         alert(jsonData.message);
       }
     }
   });
+});
+
+$("#sync_btn").click(function() {
+  console.log("Update score");
+  var gameOver = document.getElementById("gameOver").innerHTML;
+  var gameHighest = document.getElementById("score").innerHTML;
+  console.log(max_score);
+  console.log(gameHighest);
+  // If the highest score in the game is higher than the one in the database, update the score in database.
+  console.log(gameOver && gameHighest > max_score);
+  if (gameOver && gameHighest > max_score) {
+    console.log("in if");
+    $.ajax({
+      url: "user/updateScore.php",
+      type: "get",
+      data: {"username": username, "gameHighest": gameHighest},
+      success: function(data){
+        console.log("data");
+        var jsonData = JSON.parse(data);
+        if(jsonData.success){
+          console.log("success");
+        } else {
+          alert(jsonData.message);
+        }
+      }
+    });
+  }
 });
