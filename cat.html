@@ -14,14 +14,20 @@
 	}
 	.Login{
 		position: absolute;
-		top:2px;
-		right:16px;
+		top:10px;
+		right:25px;
 		margin: auto;
 	}
 	.AfterLogIn{
 		position: absolute;
-		top:2px;
-		right:16px;
+		top:10px;
+		right:45px;
+		margin: auto;
+	}
+	.Instruction{
+		position: absolute;
+		top: 10px;
+		left: 5px;
 		margin: auto;
 	}
 	</style>
@@ -29,9 +35,9 @@
 <body>
 	<div class="Login" id="Login">
 		<label for="username">Username</label>
-		<input type="text" name="username" id="username"/> <br>
+		<input type="text" name="username" id="username"/> <br><br>
 		<label for="password">Password</label>
-		<input type="password" name="password" id="password"/> <br>
+		<input type="password" name="password" id="password"/> <br><br>
 		<button id="login_btn">Log In</button> <br> <br>
 		<button id="register_btn">Register</button> <br>
 	</div>
@@ -42,11 +48,35 @@
 		<label id="scorePrompt" hidden="hidden">Your highest score: </label>
 		<div id="score" hidden="hidden"> </div>
 		<div id="gameOver" hidden="hidden"> </div>
-		<button id="sync_btn">Sync my score</button> <br>
+		<button id="sync_btn" hidden="hidden">Sync my score</button> <br>
+	</div>
+
+	<div class="Instruction" id="Instruction">
+	<ul>
+	<li>Use ← and → to control the cat's direction and use ↑ <br>
+	to jump. </li><br>
+	<li>You can only jump if you touch a block.</li><br>
+	<li>If the cat exits the screen from the borrder <br>
+	on the left, right or bottom, you will lose <br>
+	a life. When you don't have any life left, <br>
+	the game is over.</li><br>
+	<li>If the cat eats a star, you will get 10 points. </li><br>
+	<li>If the cat eats a diamond, you will gain <br>
+	an extra life.</li><br>
+	<li>You can register or log in. After you log in, <br>
+	you will see you highest score. If you are a <br>
+	new user, your current highest score will <br>
+	automatically be 0 when the game starts.</li><br>
+	<li>After the game is over, click "sync my score"<br>
+	to synchronize your score to the database. <br>
+	If you click this button when the game is not<br>
+	over, your score will not be synchronized.</li><br>
+</ul>
 	</div>
 	<script type="text/javascript" src="user/Logout.js"></script>
 	<script type="text/javascript" src="user/cat_user.js"></script>
 	<script type="text/javascript">
+
 
 	//  GameItem class extending Phaser.Sprite
 	GameItem = function (x, y, itemType) {

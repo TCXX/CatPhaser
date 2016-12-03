@@ -16,6 +16,7 @@ $("#logout_btn").click(function() {
 				document.getElementById("Login").style.display = 'block';
 				document.getElementById("scorePrompt").style.display = 'none';
 				document.getElementById("score").style.display = 'none';
+				document.getElementById("sync_btn").style.display = 'none';
 				document.getElementById("ShowUser").innerHTML = "";
 
 			}

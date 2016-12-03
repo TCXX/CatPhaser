@@ -21,6 +21,7 @@ $("#login_btn").click(function() {
         document.getElementById("scorePrompt").style.display = 'block';
         max_score = jsonData.max_score;
         document.getElementById("score").style.display = 'block';
+        document.getElementById("sync_btn").style.display = 'block';
         document.getElementById("score").innerHTML = jsonData.max_score;
       } else {
         alert(jsonData.message);
@@ -48,6 +49,7 @@ $("#register_btn").click(function() {
         document.getElementById("logout_btn").style.display = 'block';
         document.getElementById("scorePrompt").style.display = 'block';
         document.getElementById("score").style.display = 'block';
+        document.getElementById("sync_btn").style.display = 'block';
         document.getElementById("score").innerHTML = 0;
         max_score = 0;
       } else {
@@ -86,6 +88,7 @@ $("#sync_btn").click(function() {
                   gameHighest: score
               }, function () {
                   console.log("update Back");
+                  alert("Sync success");
       });
   }
 
