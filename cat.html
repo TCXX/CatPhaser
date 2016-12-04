@@ -63,6 +63,8 @@
 	<li>If the cat eats a star, you will get 10 points. </li><br>
 	<li>If the cat eats a diamond, you will gain <br>
 	an extra life.</li><br>
+	<li>If the cat reaches the bubble, you will go to <br>
+	the next level.</li><br>
 	<li>You can register or log in. After you log in, <br>
 	you will see you highest score. If you are a <br>
 	new user, your current highest score will <br>
@@ -184,8 +186,8 @@
 
 		//  Add Texts.
 		player.health = 9;
-		scoreText = game.add.text(game.width - 30 - 100, 40, 'Score: 0', { fontSize: '32px', fill: '#000' });
-		lifeText = game.add.text(game.width - 30 - 100, 10, 'Life: 9', { fontSize: '32px', fill: '#000' });
+		scoreText = game.add.text(game.width - 30 - 100, 40, 'Score: 0', { fontSize: '24px', fill: '#000' });
+		lifeText = game.add.text(game.width - 30 - 100, 10, 'Life: 9', { fontSize: '24px', fill: '#000' });
 
 		//  Set input controls.
 		cursors = game.input.keyboard.createCursorKeys();
