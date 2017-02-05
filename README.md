@@ -2,7 +2,7 @@
 By **Cindy Le** and **Xueyan Xie**
 
 ##Introduction
-This is a game where the user can control a cat to move it to a bubble(destination). After the cat reaches the bubble, the user will go to the next level of game. We will use another framework to create this game.
+This is a game where the user can control a cat to move it to a bubble (destination). After the cat reaches the bubble, the user will go to the next level of game. We will use another framework to create this game.
 
 ##How to Play
 * Use ← and → to control the cat's direction and use ↑ to jump.
