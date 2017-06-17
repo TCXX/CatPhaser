@@ -1,10 +1,14 @@
 # CatPhaser
 By **Cindy Le** and **Xueyan Xie**
 
-##Introduction
+## Introduction
 This is a game where the user can control a cat to move it to a bubble (destination). After the cat reaches the bubble, the user will go to the next level of game. We will use another framework to create this game.
 
-##How to Play
+## How to Run
+* Upload the content in this repo to a same directory on a server.
+* Visit the file path where cat.html is located.
+
+## How to Play
 * Use ← and → to control the cat's direction and use ↑ to jump.
 * You can only jump if you touch a block.
 * If the cat exits the screen from the border on the left, right or bottom, you will lose a life. When you don't have any life left, the game is over.
